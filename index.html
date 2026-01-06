@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gold Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fff8dc, #f5f5dc);
+      color: #4b3e2a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #b8860b;
+      font-size: 36px;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 1px #fff;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input, select {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #d4af37;
+      border-radius: 5px;
+      width: 280px;
+      font-size: 16px;
+      background-color: #fffaf0;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    button {
+      background-color: #d4af37;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #c5a02e;
+    }
+
+    #answer {
+      margin-top: 30px;
+      font-size: 20px;
+      color: #6b4e16;
+      background-color: #fff8e1;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #d4af37;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Gold Calculator</h1>
+
+<label for="purity">Gold Purity:</label>
+<select id="purity" onchange="clearInputsImmediately()">
+  <option value="18">18K</option>
+  <option value="20">20K</option>
+  <option value="22">22K</option>
+</select>
+
+<label>Gross weight</label>
+<input type="text" id="num1">
+
+<label>Non-gold weight</label>
+<input type="text" id="num2" placeholder="e.g. 5%">
+
+<label>Stone weight</label>
+<input type="text" id="num3">
+
+<label>Bank value for 6 month</label>
+<input type="text" id="num4" placeholder="Enter manually">
+
+<label>Bank value for 1 year</label>
+<input type="text" id="num5" placeholder="Enter manually">
+
+<label>Market value for 6 month</label>
+<input type="text" id="market6" placeholder="Enter manually">
+
+<label>Market value for 1 year</label>
+<input type="text" id="market12" placeholder="Enter manually">
+
+<button onclick="calculate()">Calculate</button>
+
+<div id="answer"></div>
+
+<script>
+function clearInputsImmediately() {
+  document.getElementById("num1").value = "";
+  document.getElementById("num2").value = "";
+  document.getElementById("num3").value = "";
+  document.getElementById("num4").value = "";
+  document.getElementById("num5").value = "";
+  document.getElementById("market6").value = "";
+  document.getElementById("market12").value = "";
+  document.getElementById("answer").innerHTML = "";
+}
+
+function calculate() {
+  var field1 = parseFloat(document.getElementById("num1").value);
+  var rawPercent = document.getElementById("num2").value;
+  var field3 = parseFloat(document.getElementById("num3").value);
+  var field4 = parseFloat(document.getElementById("num4").value);
+  var field5 = parseFloat(document.getElementById("num5").value);
+  var market6 = parseFloat(document.getElementById("market6").value);
+  var market12 = parseFloat(document.getElementById("market12").value);
+
+  var percent = parseFloat(rawPercent.replace('%', ''));
+
+  var netGoldWeight = field1 - (field1 * percent / 100) - field3;
+  var loanValue6Month = netGoldWeight * field4;
+  var loanValue1Year = netGoldWeight * field5;
+  var marketValue6Month = netGoldWeight * market6;
+  var marketValue1Year = netGoldWeight * market12;
+
+  if (
+    !isNaN(netGoldWeight) &&
+    !isNaN(loanValue6Month) &&
+    !isNaN(loanValue1Year) &&
+    !isNaN(marketValue6Month) &&
+    !isNaN(marketValue1Year)
+  ) {
+    document.getElementById("answer").innerHTML =
+      "💰 <strong>Net gold weight:</strong> " + netGoldWeight.toFixed(2) + " grams<br><br>" +
+      "🏦 <strong>Bank value for 6 months:</strong> ₹" + loanValue6Month.toFixed(2) + "<br>" +
+      "🏦 <strong>Bank value for 1 year:</strong> ₹" + loanValue1Year.toFixed(2) + "<br><br>" +
+      "📈 <strong>Market value for 6 months:</strong> ₹" + marketValue6Month.toFixed(2) + "<br>" +
+      "📈 <strong>Market value for 1 year:</strong> ₹" + marketValue1Year.toFixed(2);
+  } else {
+    document.getElementById("answer").innerHTML = "⚠️ Please enter valid numbers.";
+  }
+}
+</script>
+
+</body>
+</html>
