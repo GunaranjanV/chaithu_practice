@@ -10,8 +10,7 @@ pipeline {
             }
             stage("Hostname"){
                 steps{
-                    sh 'hostname -I'
-                    echo "$(hostname -I)"
+                    sh "hostname -I"
                 }
             }
         }
