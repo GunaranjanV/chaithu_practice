@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'prod'
+    }
         stages{
             stage("git checkout"){
                 steps{
