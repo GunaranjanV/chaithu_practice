@@ -8,19 +8,10 @@ pipeline {
                     git branch: 'main', url: 'https://github.com/GunaranjanV/chaithu_practice.git'
                 }
             }
-            stage("Build"){
+            stage("Hostname"){
                 steps{
-                    echo "This is build stage"
-                }
-            }
-            stage("test"){
-                steps{
-                    echo "This is test stage"
-                }
-            }
-            stage("Prod"){
-                steps{
-                    echo "This is prod stage"
+                    sh 'hostname'
+                    echo "$hostname"
                 }
             }
         }
