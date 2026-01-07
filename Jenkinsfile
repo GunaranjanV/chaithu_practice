@@ -38,7 +38,7 @@ pipeline {
                 sh '''
                     docker stop gunaranjanv/chaithu:1 || true
                     docker rm gunaranjanv/chaithu:1 || true
-                    docker run -it -d --name new_website -p 9001:8080 gunaranjanv/chaithu:1
+                    docker run -it -d --name guna_web -p 9009:8080 gunaranjanv/chaithu:1
                     '''
             }
         }
