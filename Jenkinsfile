@@ -36,10 +36,11 @@ pipeline {
         stage('Docker Containerization'){
             steps{
                 sh '''
-                    docker stop gunaranjanv/chaithu:1 || true
-                    docker rm gunaranjanv/chaithu:1 || true
+                    docker stop guna_web || true
+                    docker rm guna_web || true
                     docker run -it -d --name guna_web -p 9009:8080 gunaranjanv/chaithu:1
-                    '''
+                '''
+
             }
         }
         stage('Docker login'){
