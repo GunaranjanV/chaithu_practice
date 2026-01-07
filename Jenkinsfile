@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Git checkout'){
             steps{
-            git branch: 'final_project', url: 'https://github.com/GunaranjanV/Practice_day22.git'
+            git branch: 'Jenkins', url: 'https://github.com/GunaranjanV/chaithu_practice.git'
             }
         }
         stage('Maven compile'){
@@ -24,13 +24,13 @@ pipeline {
         }
         stage('Docker image creation'){
             steps{
-                sh 'docker build -t gunaranjanv/appu:1 .'
+                sh 'docker build -t gunaranjanv/chaithu:1 .'
             }
         }
 
         stage('Docker Image scan'){
             steps{
-                sh 'trivy image --format table -o trivy-image-report.html gunaranjanv/appu:1'
+                sh 'trivy image --format table -o trivy-image-report.html gunaranjanv/chaithu:1'
             }
         }
         stage('Docker Containerization'){
@@ -38,7 +38,7 @@ pipeline {
                 sh '''
                     docker stop gunaranjanv/website:1 || true
                     docker rm gunaranjanv/website:1 || true
-                    docker run -it -d --name new_website -p 9001:8080 gunaranjanv/appu:1
+                    docker run -it -d --name new_website -p 9001:8080 gunaranjanv/chaithu:1
                     '''
             }
         }
@@ -56,7 +56,7 @@ pipeline {
         }
         stage('Docker push'){
             steps{
-                sh 'docker push gunaranjanv/appu:1'
+                sh 'docker push gunaranjanv/chaithu:1'
             }
         }
 
