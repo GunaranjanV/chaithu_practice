@@ -36,8 +36,8 @@ pipeline {
         stage('Docker Containerization'){
             steps{
                 sh '''
-                    docker stop gunaranjanv/website:1 || true
-                    docker rm gunaranjanv/website:1 || true
+                    docker stop gunaranjanv/chaithu:1 || true
+                    docker rm gunaranjanv/chaithu:1 || true
                     docker run -it -d --name new_website -p 9001:8080 gunaranjanv/chaithu:1
                     '''
             }
