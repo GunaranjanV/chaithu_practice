@@ -1,65 +1,71 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'java-11'
-        maven 'maven'
+    parameters {
+        choice(
+            name: 'terraformAction',
+            choices: ['apply','destroy'],
+            description: 'Choose your terraform action to perform'
+        )
+    }
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
 
     stages {
-        stage('Git checkout') {
+        stage("Git checkout") {
             steps {
-                git branch: 'main', url: 'https://github.com/GunaranjanV/chaithu_practice.git'
-            }
-        }
-
-        stage('Compile') {
-            steps {
-                sh "mvn compile"
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh "mvn clean install"
-            }
-        }
-
-        stage('Build and tag') {
-            steps {
-                sh "docker build -t gunaranjanv/webapp:1 ."
-            }
-        }
-
-        stage('Docker image scan') {
-            steps {
-                sh "trivy image --format table -o trivy-image-report.html gunaranjanv/webapp:1"
-            }
-        }
-
-        stage('Containersation') {
-            steps {
-                sh '''
-                    docker stop chaithu3 || true
-                    docker rm chaithu3 || true
-                    docker run -it -d --name chaithu3 -p 9004:8080 gunaranjanv/webapp:1
-                '''
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    }
+                dir("terraform") {
+                    git branch: 'terraform', url: 'https://github.com/GunaranjanV/chaithu_practice.git'
                 }
             }
         }
 
-        stage('Pushing image to repository') {
+        stage('plan') {
             steps {
-                sh 'docker push gunaranjanv/webapp:1'
+                sh '''
+                    cd all_in_one/
+                    terraform init
+                    terraform plan -out=tfplan
+                    terraform show -no-color tfplan > tfplan.txt
+                '''
+            }
+        }
+
+        stage('approval') {
+            steps {
+                script {
+                    def plan = readFile 'all_in_one/tfplan.txt'
+                    input message: "Do you want to proceed with terraform action?",
+                          parameters: [text(name: 'plan',
+                                            description: 'Review your plan one more time',
+                                            defaultValue: plan)]
+                }
+            }
+        }
+
+        stage('Apply or Destroy') {
+            when {
+                expression {
+                    return params.terraformAction == 'apply' || params.terraformAction == 'destroy'
+                }
+            }
+            steps {
+                script {
+                    if (params.terraformAction == 'apply') {
+                        sh '''
+                            cd all_in_one/
+                            terraform apply -input=false tfplan
+                        '''
+                    } else if (params.terraformAction == 'destroy') {
+                        sh '''
+                            cd all_in_one/
+                            terraform destroy -auto-approve
+                        '''
+                    }
+                }
             }
         }
     }
